@@ -4,7 +4,17 @@ import { createClient } from "jsr:@supabase/supabase-js@2"
 
 const ALLOWED_ORIGIN = "https://samx.io"
 
+const CORS_HEADERS = {
+  "Access-Control-Allow-Origin": ALLOWED_ORIGIN,
+  "Access-Control-Allow-Methods": "POST",
+  "Access-Control-Allow-Headers": "Content-Type, Authorization",
+}
+
 Deno.serve(async (req) => {
+  if (req.method === "OPTIONS") {
+    return new Response(null, { status: 204, headers: CORS_HEADERS })
+  }
+
   if (req.method !== "POST") {
     return new Response("Method Not Allowed", { status: 405 })
   }
@@ -30,13 +40,13 @@ Deno.serve(async (req) => {
   if (error) {
     return new Response(JSON.stringify({ error: error.message }), {
       status: 500,
-      headers: { "Content-Type": "application/json" },
+      headers: { "Content-Type": "application/json", ...CORS_HEADERS },
     })
   }
 
   return new Response(JSON.stringify(data), {
     status: 201,
-    headers: { "Content-Type": "application/json" },
+    headers: { "Content-Type": "application/json", ...CORS_HEADERS },
   })
 })
 
