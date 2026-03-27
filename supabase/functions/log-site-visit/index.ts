@@ -24,7 +24,8 @@ Deno.serve(async (req) => {
     return new Response("Forbidden", { status: 403 })
   }
 
-  const { path, referrer, user_agent } = await req.json()
+  const { path, referrer, user_agent, language, timezone } = await req.json()
+  const country = req.headers.get("x-country") ?? null
 
   const supabase = createClient(
     Deno.env.get("SUPABASE_URL")!,
@@ -33,7 +34,7 @@ Deno.serve(async (req) => {
 
   const { data, error } = await supabase
     .from("site_visits")
-    .insert({ path, referrer, user_agent })
+    .insert({ path, referrer, user_agent, country, language, timezone })
     .select()
     .single()
 
